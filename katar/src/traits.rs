@@ -102,12 +102,10 @@ macro_rules! define_simd_compare_ops {
     };
 }
 
-pub trait SimdMask: Copy + Send + Sync + 'static {
-    type bits: Copy + Sync + Send + 'static;
-
+pub trait MaskSimd: Copy + Send + Sync + 'static {
     fn splat(v: bool) -> Self;
-    fn from_bits(v: Self::bits) -> Self;
-    fn to_bits(self) -> Self::bits;
+    fn from_bits(v: u64) -> Self;
+    fn to_bits(self) -> u64;
 
     fn and(self, other: Self) -> Self;
     fn or(self, other: Self) -> Self;
@@ -121,13 +119,13 @@ pub trait Simd: FloatSimd {}
 pub trait FloatSimd: Copy + Sync + Send + 'static {
     type f32: Copy + Sync + Send + 'static;
     type f64: Copy + Sync + Send + 'static;
-    type m32: SimdMask;
-    type m64: SimdMask;
+    type m32: MaskSimd;
+    type m64: MaskSimd;
 
     const f32_lanes: usize;
     const f64_lanes: usize;
     const m32_lanes: usize = Self::f32_lanes;
-    const m64_lanes: usize = Self::f32_lanes;
+    const m64_lanes: usize = Self::f64_lanes;
 
     define_io_ops!(f32);
     define_io_ops!(f64);
