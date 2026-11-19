@@ -1,5 +1,5 @@
 #![no_std]
-#![allow(non_upper_case_globals, non_camel_case_types)]
+#![allow(non_upper_case_globals, non_camel_case_types, clippy::new_without_default)]
 use crate::{backend::fallback::ScalarFallback, traits::Simd};
 
 mod backend;
@@ -21,12 +21,6 @@ enum Backend {
 #[derive(Clone, Copy)]
 pub struct Arch {
     backend: Backend,
-}
-
-impl Default for Arch {
-    fn default() -> Self {
-        Arch { backend: Backend::ScalarFallback }
-    }
 }
 
 impl Arch {
