@@ -4,6 +4,7 @@ use crate::{backend::fallback::ScalarFallback, traits::Simd};
 
 mod backend;
 pub mod traits;
+pub mod utils;
 
 pub trait SimdFn {
     type Result;
