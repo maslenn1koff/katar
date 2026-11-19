@@ -14,6 +14,7 @@ pub trait SimdFn {
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Backend {
     ScalarFallback,
+    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     Avx2Fma,
 }
 
@@ -41,13 +42,10 @@ impl Arch {
     }
 
     pub fn dispatch<Op: SimdFn>(&self, op: Op) -> Op::Result {
-        #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
-        {
-            if self.backend == Backend::Avx2Fma {
-                return unsafe { backend::x86::avx2::vectorize(op) };
-            }
+        match self.backend {
+            Backend::ScalarFallback => op.call(ScalarFallback),
+            #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+            Backend::Avx2Fma => unsafe { backend::x86::avx2::vectorize(op) },
         }
-
-        op.call(ScalarFallback)
     }
 }

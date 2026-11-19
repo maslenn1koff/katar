@@ -6,4 +6,5 @@ edition = "2024"
 [dependencies]
 paste = "1"
 libm = { version = "0.2", default-features = false }
+[target.'cfg(any(target_arch = "x86", target_arch = "x86_64"))'.dependencies]
 core_detect = "1"
