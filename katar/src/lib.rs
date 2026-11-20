@@ -16,6 +16,8 @@ enum Backend {
     ScalarFallback,
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     Avx2Fma,
+    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+    Sse2,
 }
 
 #[derive(Clone, Copy)]
@@ -30,6 +32,10 @@ impl Arch {
             if core_detect::is_x86_feature_detected!("avx2") && core_detect::is_x86_feature_detected!("fma") {
                 return Arch { backend: Backend::Avx2Fma };
             }
+
+            if core_detect::is_x86_feature_detected!("sse2") {
+                return Arch { backend: Backend::Sse2 };
+            }
         }
 
         Arch { backend: Backend::ScalarFallback }
@@ -40,6 +46,8 @@ impl Arch {
             Backend::ScalarFallback => op.call(ScalarFallback),
             #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
             Backend::Avx2Fma => unsafe { backend::x86::avx2::vectorize(op) },
+            #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+            Backend::Sse2 => unsafe { backend::x86::sse2::vectorize(op) },
         }
     }
 }

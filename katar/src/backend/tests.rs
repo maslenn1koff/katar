@@ -405,6 +405,69 @@ fn scalar_fallback_store_f64_panics_on_empty_slice() {
 }
 
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+fn sse2_available() -> bool {
+    core_detect::is_x86_feature_detected!("sse2")
+}
+
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+#[test]
+fn sse2_f32() {
+    if !sse2_available() {
+        return;
+    }
+    exercise_f32(super::x86::sse2::Sse2);
+}
+
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+#[test]
+fn sse2_f64() {
+    if !sse2_available() {
+        return;
+    }
+    exercise_f64(super::x86::sse2::Sse2);
+}
+
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+#[test]
+fn sse2_masks() {
+    if !sse2_available() {
+        return;
+    }
+    check_mask_f32::<super::x86::sse2::Sse2>();
+    check_mask_f64::<super::x86::sse2::Sse2>();
+}
+
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+#[test]
+fn sse2_load_f32_panics_on_short_slice() {
+    if !sse2_available() {
+        return;
+    }
+
+    let result = std::panic::catch_unwind(|| {
+        let src = [1.0f32; 3];
+        super::x86::sse2::Sse2.load_f32(&src);
+    });
+
+    assert!(result.is_err());
+}
+
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+#[test]
+fn sse2_load_f64_panics_on_short_slice() {
+    if !sse2_available() {
+        return;
+    }
+
+    let result = std::panic::catch_unwind(|| {
+        let src = [1.0f64; 1];
+        super::x86::sse2::Sse2.load_f64(&src);
+    });
+
+    assert!(result.is_err());
+}
+
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 fn avx2_fma_available() -> bool {
     core_detect::is_x86_feature_detected!("avx2") && core_detect::is_x86_feature_detected!("fma")
 }
