@@ -13,6 +13,7 @@ pub trait SimdFn {
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Backend {
+    #[allow(dead_code)]
     ScalarFallback,
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     Avx512F,
@@ -20,6 +21,8 @@ enum Backend {
     Avx2Fma,
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     Sse2,
+    #[cfg(target_arch = "aarch64")]
+    Neon,
 }
 
 #[derive(Clone, Copy)]
@@ -29,6 +32,11 @@ pub struct Arch {
 
 impl Arch {
     pub fn new() -> Self {
+        #[cfg(target_arch = "aarch64")]
+        {
+            Arch { backend: Backend::Neon }
+        }
+
         #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
         {
             if core_detect::is_x86_feature_detected!("avx512f") {
@@ -42,8 +50,11 @@ impl Arch {
             if core_detect::is_x86_feature_detected!("sse2") {
                 return Arch { backend: Backend::Sse2 };
             }
+
+            Arch { backend: Backend::ScalarFallback }
         }
 
+        #[cfg(not(any(target_arch = "x86", target_arch = "x86_64", target_arch = "aarch64")))]
         Arch { backend: Backend::ScalarFallback }
     }
 
@@ -56,6 +67,8 @@ impl Arch {
             Backend::Avx2Fma => unsafe { backend::x86::avx2::vectorize(op) },
             #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
             Backend::Sse2 => unsafe { backend::x86::sse2::vectorize(op) },
+            #[cfg(target_arch = "aarch64")]
+            Backend::Neon => unsafe { backend::aarch64::neon::vectorize(op) },
         }
     }
 }

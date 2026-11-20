@@ -577,3 +577,44 @@ fn avx2_fma_load_f32_panics_on_short_slice() {
 
     assert!(result.is_err());
 }
+
+#[cfg(target_arch = "aarch64")]
+#[test]
+fn neon_f32() {
+    exercise_f32(super::aarch64::neon::Neon);
+}
+
+#[cfg(target_arch = "aarch64")]
+#[test]
+fn neon_f64() {
+    exercise_f64(super::aarch64::neon::Neon);
+}
+
+#[cfg(target_arch = "aarch64")]
+#[test]
+fn neon_masks() {
+    check_mask_f32::<super::aarch64::neon::Neon>();
+    check_mask_f64::<super::aarch64::neon::Neon>();
+}
+
+#[cfg(target_arch = "aarch64")]
+#[test]
+fn neon_load_f32_panics_on_short_slice() {
+    let result = std::panic::catch_unwind(|| {
+        let src = [1.0f32; 3];
+        super::aarch64::neon::Neon.load_f32(&src);
+    });
+
+    assert!(result.is_err());
+}
+
+#[cfg(target_arch = "aarch64")]
+#[test]
+fn neon_load_f64_panics_on_short_slice() {
+    let result = std::panic::catch_unwind(|| {
+        let src = [1.0f64; 1];
+        super::aarch64::neon::Neon.load_f64(&src);
+    });
+
+    assert!(result.is_err());
+}

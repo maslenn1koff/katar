@@ -1,7 +1,7 @@
 fn dot_f32(x: &[f32], y: &[f32]) -> f32 {
     struct Impl<'a>(&'a [f32], &'a [f32]);
 
-    impl <'a> katar::SimdFn for Impl <'a> {
+    impl<'a> katar::SimdFn for Impl<'a> {
         type Result = f32;
 
         #[inline(always)]
