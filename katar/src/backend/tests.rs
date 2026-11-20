@@ -3,8 +3,8 @@ extern crate std;
 use super::fallback::ScalarFallback;
 use crate::traits::{FloatSimd, MaskSimd, Simd};
 
-const MAX_F32_LANES: usize = 8;
-const MAX_F64_LANES: usize = 4;
+const MAX_F32_LANES: usize = 16;
+const MAX_F64_LANES: usize = 8;
 
 fn f32_input<S: Simd>(base: f32, step: f32) -> [f32; MAX_F32_LANES] {
     let mut data = [0.0f32; MAX_F32_LANES];
