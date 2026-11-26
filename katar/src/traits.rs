@@ -208,7 +208,7 @@ pub trait IntegerSimd: Copy + Sync + Send + 'static {
     define_simd_unary_ops!(u32, bitnot, count_ones, leading_zeros, trailing_zeros);
     define_simd_unary_ops!(i32, bitnot, count_ones, leading_zeros, trailing_zeros, abs, neg);
     define_simd_unary_ops!(u64, bitnot, count_ones, leading_zeros, trailing_zeros);
-    define_simd_unary_ops!(i64, bitnot, count_ones, leading_zeros, trailing_zeros);
+    define_simd_unary_ops!(i64, bitnot, count_ones, leading_zeros, trailing_zeros, abs, neg);
 
     define_simd_binary_ops!(u8, add, sub, mul, min, max, bitand, bitor, bitxor, bitandnot, saturating_add, saturating_sub, avg_round);
     define_simd_binary_ops!(i8, add, sub, mul, min, max, bitand, bitor, bitxor, bitandnot, saturating_add, saturating_sub, avg_round);

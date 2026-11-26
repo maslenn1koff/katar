@@ -281,6 +281,7 @@ impl IntegerSimd for ScalarFallback {
     define_unary_wrapping_ops!(i8, abs, neg);
     define_unary_wrapping_ops!(i16, abs, neg);
     define_unary_wrapping_ops!(i32, abs, neg);
+    define_unary_wrapping_ops!(i64, abs, neg);
 
     define_unary_ops!(u8, count_ones, leading_zeros, trailing_zeros);
     define_unary_ops!(i8, count_ones, leading_zeros, trailing_zeros);
