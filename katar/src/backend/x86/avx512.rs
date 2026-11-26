@@ -13,6 +13,18 @@ pub fn vectorize<Op: SimdFn>(op: Op) -> Op::Result {
     op.call(Avx512Software::new())
 }
 
+#[target_feature(
+    enable = "avx512f",
+    enable = "avx512bw",
+    enable = "avx512dq",
+    enable = "avx512bitalg",
+    enable = "avx512cd",
+    enable = "avx512vpopcntdq"
+)]
+pub fn vectorize_ex<Op: SimdFn>(op: Op) -> Op::Result {
+    op.call(Avx512Software::new())
+}
+
 #[derive(Copy, Clone)]
 pub struct Avx512MaskF32(__mmask16);
 

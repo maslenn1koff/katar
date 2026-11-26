@@ -18,6 +18,8 @@ enum Backend {
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     Avx512F,
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+    Avx512Ex,
+    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     Avx2Fma,
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     Sse2,
@@ -40,6 +42,12 @@ impl Arch {
         #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
         {
             if core_detect::is_x86_feature_detected!("avx512f") && core_detect::is_x86_feature_detected!("avx512bw") && core_detect::is_x86_feature_detected!("avx512dq") {
+                if core_detect::is_x86_feature_detected!("avx512cd")
+                    && core_detect::is_x86_feature_detected!("avx512bitalg")
+                    && core_detect::is_x86_feature_detected!("avx512vpopcntdq")
+                {
+                    return Arch { backend: Backend::Avx512Ex };
+                }
                 return Arch { backend: Backend::Avx512F };
             }
 
@@ -60,7 +68,8 @@ impl Arch {
 
     pub fn dispatch<Op: SimdFn>(&self, op: Op) -> Op::Result {
         match self.backend {
-            Backend::ScalarFallback => op.call(ScalarFallback),
+            #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+            Backend::Avx512Ex => unsafe { backend::x86::avx512::vectorize_ex(op) },
             #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
             Backend::Avx512F => unsafe { backend::x86::avx512::vectorize(op) },
             #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
@@ -69,6 +78,7 @@ impl Arch {
             Backend::Sse2 => unsafe { backend::x86::sse2::vectorize(op) },
             #[cfg(target_arch = "aarch64")]
             Backend::Neon => unsafe { backend::aarch64::neon::vectorize(op) },
+            Backend::ScalarFallback => op.call(ScalarFallback),
         }
     }
 }
