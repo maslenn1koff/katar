@@ -380,8 +380,8 @@ impl FloatSimd for Neon {
     type f32 = float32x4_t;
     type f64 = float64x2_t;
 
-    type m32 = NeonMaskF32;
-    type m64 = NeonMaskF64;
+    type mf32 = NeonMaskF32;
+    type mf64 = NeonMaskF64;
 
     const f32_lanes: usize = 4;
     const f64_lanes: usize = 2;
@@ -571,72 +571,72 @@ impl FloatSimd for Neon {
     }
 
     #[inline(always)]
-    fn eq_f32(self, a: Self::f32, b: Self::f32) -> Self::m32 {
+    fn eq_f32(self, a: Self::f32, b: Self::f32) -> Self::mf32 {
         unsafe { NeonMaskF32(vceqq_f32(a, b)) }
     }
 
     #[inline(always)]
-    fn eq_f64(self, a: Self::f64, b: Self::f64) -> Self::m64 {
+    fn eq_f64(self, a: Self::f64, b: Self::f64) -> Self::mf64 {
         unsafe { NeonMaskF64(vceqq_f64(a, b)) }
     }
 
     #[inline(always)]
-    fn ge_f32(self, a: Self::f32, b: Self::f32) -> Self::m32 {
+    fn ge_f32(self, a: Self::f32, b: Self::f32) -> Self::mf32 {
         unsafe { NeonMaskF32(vcgeq_f32(a, b)) }
     }
 
     #[inline(always)]
-    fn ge_f64(self, a: Self::f64, b: Self::f64) -> Self::m64 {
+    fn ge_f64(self, a: Self::f64, b: Self::f64) -> Self::mf64 {
         unsafe { NeonMaskF64(vcgeq_f64(a, b)) }
     }
 
     #[inline(always)]
-    fn gt_f32(self, a: Self::f32, b: Self::f32) -> Self::m32 {
+    fn gt_f32(self, a: Self::f32, b: Self::f32) -> Self::mf32 {
         unsafe { NeonMaskF32(vcgtq_f32(a, b)) }
     }
 
     #[inline(always)]
-    fn gt_f64(self, a: Self::f64, b: Self::f64) -> Self::m64 {
+    fn gt_f64(self, a: Self::f64, b: Self::f64) -> Self::mf64 {
         unsafe { NeonMaskF64(vcgtq_f64(a, b)) }
     }
 
     #[inline(always)]
-    fn le_f32(self, a: Self::f32, b: Self::f32) -> Self::m32 {
+    fn le_f32(self, a: Self::f32, b: Self::f32) -> Self::mf32 {
         unsafe { NeonMaskF32(vcleq_f32(a, b)) }
     }
 
     #[inline(always)]
-    fn le_f64(self, a: Self::f64, b: Self::f64) -> Self::m64 {
+    fn le_f64(self, a: Self::f64, b: Self::f64) -> Self::mf64 {
         unsafe { NeonMaskF64(vcleq_f64(a, b)) }
     }
 
     #[inline(always)]
-    fn lt_f32(self, a: Self::f32, b: Self::f32) -> Self::m32 {
+    fn lt_f32(self, a: Self::f32, b: Self::f32) -> Self::mf32 {
         unsafe { NeonMaskF32(vcltq_f32(a, b)) }
     }
 
     #[inline(always)]
-    fn lt_f64(self, a: Self::f64, b: Self::f64) -> Self::m64 {
+    fn lt_f64(self, a: Self::f64, b: Self::f64) -> Self::mf64 {
         unsafe { NeonMaskF64(vcltq_f64(a, b)) }
     }
 
     #[inline(always)]
-    fn ne_f32(self, a: Self::f32, b: Self::f32) -> Self::m32 {
+    fn ne_f32(self, a: Self::f32, b: Self::f32) -> Self::mf32 {
         unsafe { NeonMaskF32(vmvnq_u32(vceqq_f32(a, b))) }
     }
 
     #[inline(always)]
-    fn ne_f64(self, a: Self::f64, b: Self::f64) -> Self::m64 {
+    fn ne_f64(self, a: Self::f64, b: Self::f64) -> Self::mf64 {
         unsafe { NeonMaskF64(veorq_u64(vceqq_f64(a, b), vdupq_n_u64(u64::MAX))) }
     }
 
     #[inline(always)]
-    fn select_f32(self, mask: Self::m32, a: Self::f32, b: Self::f32) -> Self::f32 {
+    fn select_f32(self, mask: Self::mf32, a: Self::f32, b: Self::f32) -> Self::f32 {
         unsafe { vbslq_f32(mask.0, a, b) }
     }
 
     #[inline(always)]
-    fn select_f64(self, mask: Self::m64, a: Self::f64, b: Self::f64) -> Self::f64 {
+    fn select_f64(self, mask: Self::mf64, a: Self::f64, b: Self::f64) -> Self::f64 {
         unsafe { vbslq_f64(mask.0, a, b) }
     }
 

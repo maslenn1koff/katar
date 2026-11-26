@@ -129,8 +129,8 @@ pub trait Simd: FloatSimd + IntegerSimd {}
 pub trait FloatSimd: Copy + Sync + Send + 'static {
     type f32: Copy + Sync + Send + 'static;
     type f64: Copy + Sync + Send + 'static;
-    type m32: MaskSimd;
-    type m64: MaskSimd;
+    type mf32: MaskSimd;
+    type mf64: MaskSimd;
 
     const f32_lanes: usize;
     const f64_lanes: usize;
@@ -152,13 +152,13 @@ pub trait FloatSimd: Copy + Sync + Send + 'static {
     define_simd_reduce_ops!(f32, sum, max, min);
     define_simd_reduce_ops!(f64, sum, max, min);
 
-    define_simd_compare_ops!(f32, m32, eq, ne, lt, le, gt, ge);
-    define_simd_compare_ops!(f64, m64, eq, ne, lt, le, gt, ge);
+    define_simd_compare_ops!(f32, mf32, eq, ne, lt, le, gt, ge);
+    define_simd_compare_ops!(f64, mf64, eq, ne, lt, le, gt, ge);
 
     /// Per lane: `mask ? a : b`.
-    fn select_f32(self, mask: Self::m32, a: Self::f32, b: Self::f32) -> Self::f32;
+    fn select_f32(self, mask: Self::mf32, a: Self::f32, b: Self::f32) -> Self::f32;
     /// Per lane: `mask ? a : b`.
-    fn select_f64(self, mask: Self::m64, a: Self::f64, b: Self::f64) -> Self::f64;
+    fn select_f64(self, mask: Self::mf64, a: Self::f64, b: Self::f64) -> Self::f64;
 }
 
 pub trait IntegerSimd: Copy + Sync + Send + 'static {

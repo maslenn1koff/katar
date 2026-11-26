@@ -204,8 +204,8 @@ pub struct ScalarFallback;
 impl FloatSimd for ScalarFallback {
     type f32 = f32;
     type f64 = f64;
-    type m32 = FallbackMask;
-    type m64 = FallbackMask;
+    type mf32 = FallbackMask;
+    type mf64 = FallbackMask;
 
     const f32_lanes: usize = 1;
     const f64_lanes: usize = 1;
@@ -232,8 +232,8 @@ impl FloatSimd for ScalarFallback {
     define_ternary_ops!(f32);
     define_ternary_ops!(f64);
 
-    define_compare_ops!(f32, m32, eq, ne, lt, le, gt, ge);
-    define_compare_ops!(f64, m64, eq, ne, lt, le, gt, ge);
+    define_compare_ops!(f32, mf32, eq, ne, lt, le, gt, ge);
+    define_compare_ops!(f64, mf64, eq, ne, lt, le, gt, ge);
 
     define_bit_ops!(f32);
     define_bit_ops!(f64);
@@ -241,8 +241,8 @@ impl FloatSimd for ScalarFallback {
     define_reduce_ops!(f32, sum, max, min);
     define_reduce_ops!(f64, sum, max, min);
 
-    define_select_ops!(f32, m32);
-    define_select_ops!(f64, m64);
+    define_select_ops!(f32, mf32);
+    define_select_ops!(f64, mf64);
 }
 
 impl IntegerSimd for ScalarFallback {

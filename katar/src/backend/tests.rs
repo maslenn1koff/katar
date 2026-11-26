@@ -201,7 +201,7 @@ where
 fn check_compare_f32<S, F, G>(simd: S, a: &[f32; MAX_F32_LANES], b: &[f32; MAX_F32_LANES], op: F, scalar: G)
 where
     S: Simd,
-    F: Fn(S, S::f32, S::f32) -> <S as FloatSimd>::m32,
+    F: Fn(S, S::f32, S::f32) -> <S as FloatSimd>::mf32,
     G: Fn(f32, f32) -> bool,
 {
     let bits = op(simd, simd.load_f32(a), simd.load_f32(b)).to_bits();
@@ -213,7 +213,7 @@ where
 fn check_compare_f64<S, F, G>(simd: S, a: &[f64; MAX_F64_LANES], b: &[f64; MAX_F64_LANES], op: F, scalar: G)
 where
     S: Simd,
-    F: Fn(S, S::f64, S::f64) -> <S as FloatSimd>::m64,
+    F: Fn(S, S::f64, S::f64) -> <S as FloatSimd>::mf64,
     G: Fn(f64, f64) -> bool,
 {
     let bits = op(simd, simd.load_f64(a), simd.load_f64(b)).to_bits();
@@ -224,8 +224,8 @@ where
 
 fn check_mask_f32<S: Simd>() {
     let all = (1u64 << S::f32_lanes) - 1;
-    let none = <<S as FloatSimd>::m32 as MaskSimd>::from_bits(0);
-    let every = <<S as FloatSimd>::m32 as MaskSimd>::from_bits(all);
+    let none = S::mf32::from_bits(0);
+    let every = S::mf32::from_bits(all);
 
     assert!(!none.any());
     assert!(!none.all());
@@ -234,8 +234,8 @@ fn check_mask_f32<S: Simd>() {
 
     assert_eq!(every.to_bits(), all);
     assert_eq!(none.to_bits(), 0);
-    assert_eq!(<<S as FloatSimd>::m32 as MaskSimd>::splat(true).to_bits(), all);
-    assert_eq!(<<S as FloatSimd>::m32 as MaskSimd>::splat(false).to_bits(), 0);
+    assert_eq!(S::mf32::splat(true).to_bits(), all);
+    assert_eq!(S::mf32::splat(false).to_bits(), 0);
 
     assert_eq!(every.not().to_bits(), 0);
     assert_eq!(none.not().to_bits(), all);
@@ -247,8 +247,8 @@ fn check_mask_f32<S: Simd>() {
 
 fn check_mask_f64<S: Simd>() {
     let all = (1u64 << S::f64_lanes) - 1;
-    let none = <<S as FloatSimd>::m64 as MaskSimd>::from_bits(0);
-    let every = <<S as FloatSimd>::m64 as MaskSimd>::from_bits(all);
+    let none = <<S as FloatSimd>::mf64 as MaskSimd>::from_bits(0);
+    let every = <<S as FloatSimd>::mf64 as MaskSimd>::from_bits(all);
 
     assert!(!none.any());
     assert!(!none.all());
@@ -257,8 +257,8 @@ fn check_mask_f64<S: Simd>() {
 
     assert_eq!(every.to_bits(), all);
     assert_eq!(none.to_bits(), 0);
-    assert_eq!(<<S as FloatSimd>::m64 as MaskSimd>::splat(true).to_bits(), all);
-    assert_eq!(<<S as FloatSimd>::m64 as MaskSimd>::splat(false).to_bits(), 0);
+    assert_eq!(<<S as FloatSimd>::mf64 as MaskSimd>::splat(true).to_bits(), all);
+    assert_eq!(<<S as FloatSimd>::mf64 as MaskSimd>::splat(false).to_bits(), 0);
 
     assert_eq!(every.not().to_bits(), 0);
     assert_eq!(none.not().to_bits(), all);
