@@ -124,7 +124,7 @@ pub trait MaskSimd: Copy + Send + Sync + 'static {
     fn all(self) -> bool;
 }
 
-pub trait Simd: FloatSimd {}
+pub trait Simd: FloatSimd + IntegerSimd {}
 
 pub trait FloatSimd: Copy + Sync + Send + 'static {
     type f32: Copy + Sync + Send + 'static;

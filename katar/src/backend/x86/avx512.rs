@@ -8,9 +8,9 @@ use core::arch::x86::*;
 use core::arch::x86_64::*;
 use core::marker::PhantomData;
 
-#[target_feature(enable = "avx512f")]
+#[target_feature(enable = "avx512f", enable = "avx512bw", enable = "avx512dq")]
 pub fn vectorize<Op: SimdFn>(op: Op) -> Op::Result {
-    op.call(Avx512F)
+    op.call(Avx512Software::new())
 }
 
 #[derive(Copy, Clone)]
@@ -508,24 +508,23 @@ impl Avx512IntegerExt for Avx512NativeExt {
     }
 }
 
-#[derive(Copy, Clone)]
-#[allow(dead_code)]
-pub struct Avx512Int<E: Avx512IntegerExt = Avx512SoftwareExt> {
+#[derive(Clone, Copy)]
+pub struct Avx512F<E: Avx512IntegerExt = Avx512SoftwareExt> {
     _ext: PhantomData<E>,
 }
 
-impl<E: Avx512IntegerExt> Avx512Int<E> {
+impl<E: Avx512IntegerExt> Avx512F<E> {
     #[inline(always)]
-    #[allow(dead_code)]
     pub fn new() -> Self {
         Self { _ext: PhantomData }
     }
 }
 
-#[derive(Clone, Copy)]
-pub struct Avx512F;
+pub type Avx512Software = Avx512F<Avx512SoftwareExt>;
+#[allow(dead_code)]
+pub type Avx512Native = Avx512F<Avx512NativeExt>;
 
-impl FloatSimd for Avx512F {
+impl<E: Avx512IntegerExt> FloatSimd for Avx512F<E> {
     type f32 = __m512;
     type f64 = __m512d;
 
@@ -870,9 +869,9 @@ impl FloatSimd for Avx512F {
     }
 }
 
-impl Simd for Avx512F {}
+impl<E: Avx512IntegerExt> Simd for Avx512F<E> {}
 
-impl<E: Avx512IntegerExt> IntegerSimd for Avx512Int<E> {
+impl<E: Avx512IntegerExt> IntegerSimd for Avx512F<E> {
     type u8 = __m512i;
     type i8 = __m512i;
     type u16 = __m512i;
@@ -1088,7 +1087,12 @@ impl<E: Avx512IntegerExt> IntegerSimd for Avx512Int<E> {
 
     #[inline(always)]
     fn abs_i64(self, a: Self::i64) -> Self::i64 {
-        unsafe { _mm512_abs_epi64(a) }
+        let mut data = [0i64; 8];
+        self.store_i64(&mut data, a);
+        for value in data.iter_mut() {
+            *value = value.wrapping_abs();
+        }
+        self.load_i64(&data)
     }
 
     #[inline(always)]

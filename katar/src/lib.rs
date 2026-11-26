@@ -39,7 +39,7 @@ impl Arch {
 
         #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
         {
-            if core_detect::is_x86_feature_detected!("avx512f") {
+            if core_detect::is_x86_feature_detected!("avx512f") && core_detect::is_x86_feature_detected!("avx512bw") && core_detect::is_x86_feature_detected!("avx512dq") {
                 return Arch { backend: Backend::Avx512F };
             }
 

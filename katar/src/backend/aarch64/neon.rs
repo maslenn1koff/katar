@@ -877,7 +877,11 @@ impl IntegerSimd for Neon {
 
     #[inline(always)]
     fn abs_i8(self, a: Self::i8) -> Self::i8 {
-        unsafe { vabsq_s8(a) }
+        unsafe {
+            let sign = vcgtq_s8(vdupq_n_s8(0), a);
+            let value = veorq_u8(vreinterpretq_u8_s8(a), sign);
+            vreinterpretq_s8_u8(vsubq_u8(value, sign))
+        }
     }
 
     #[inline(always)]
@@ -897,7 +901,11 @@ impl IntegerSimd for Neon {
 
     #[inline(always)]
     fn abs_i16(self, a: Self::i16) -> Self::i16 {
-        unsafe { vabsq_s16(a) }
+        unsafe {
+            let sign = vcgtq_s16(vdupq_n_s16(0), a);
+            let value = veorq_u16(vreinterpretq_u16_s16(a), sign);
+            vreinterpretq_s16_u16(vsubq_u16(value, sign))
+        }
     }
 
     #[inline(always)]
@@ -917,7 +925,11 @@ impl IntegerSimd for Neon {
 
     #[inline(always)]
     fn abs_i32(self, a: Self::i32) -> Self::i32 {
-        unsafe { vabsq_s32(a) }
+        unsafe {
+            let sign = vcgtq_s32(vdupq_n_s32(0), a);
+            let value = veorq_u32(vreinterpretq_u32_s32(a), sign);
+            vreinterpretq_s32_u32(vsubq_u32(value, sign))
+        }
     }
 
     #[inline(always)]
