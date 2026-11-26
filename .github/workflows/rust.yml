@@ -13,6 +13,7 @@ permissions:
 env:
   CARGO_TERM_COLOR: always
   RUSTFLAGS: "-D warnings"
+  MSRV: "1.89.0"
 
 defaults:
   run:
@@ -51,6 +52,28 @@ jobs:
           RUSTDOCFLAGS: "-D warnings"
         run: cargo doc --workspace --no-deps --all-features
 
+  msrv:
+    name: MSRV (1.89.0)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.MSRV }}
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ./katar -> ./katar/target
+          key: msrv-${{ env.MSRV }}
+
+      - name: Check
+        run: cargo check --workspace --all-targets --all-features
+
   test:
     name: Test (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
@@ -73,6 +96,9 @@ jobs:
           - name: macOS x86_64
             os: macos-15-intel
             target: x86_64-apple-darwin
+          - name: Windows x86_64
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
 
     steps:
       - name: Checkout
@@ -101,9 +127,18 @@ jobs:
       - name: Tests
         run: cargo test --target ${{ matrix.target }} --all --all-features
 
-  wasm32:
-    name: Check (wasm32)
+      - name: Tests (release)
+        run: cargo test --release --target ${{ matrix.target }} --all --all-features
+
+  no_std:
+    name: Check no_std (${{ matrix.target }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - thumbv7em-none-eabihf
+          - wasm32-unknown-unknown
 
     steps:
       - name: Checkout
@@ -112,13 +147,13 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: wasm32-unknown-unknown
+          targets: ${{ matrix.target }}
 
       - name: Cache
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: ./katar -> ./katar/target
-          key: wasm32
+          key: no-std-${{ matrix.target }}
 
-      - name: Check
-        run: cargo check --target wasm32-unknown-unknown --lib --all-features
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }} --lib --all-features
