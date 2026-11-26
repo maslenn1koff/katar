@@ -2261,18 +2261,12 @@ impl IntegerSimd for Sse2 {
 
     #[inline(always)]
     fn narrow_saturating_u16_to_u8(self, lo: Self::u16, hi: Self::u16) -> Self::u8 {
-        let mut x = [0u16; 8];
-        let mut y = [0u16; 8];
-        self.store_u16(&mut x, lo);
-        self.store_u16(&mut y, hi);
-        let mut output = [0u8; 16];
-        for (dst, src) in output.iter_mut().zip(x.iter()) {
-            *dst = (*src).min(u8::MAX as u16) as u8;
+        unsafe {
+            let max = _mm_set1_epi16(u8::MAX as i16);
+            let lo = _mm_sub_epi16(lo, _mm_subs_epu16(lo, max));
+            let hi = _mm_sub_epi16(hi, _mm_subs_epu16(hi, max));
+            _mm_packus_epi16(lo, hi)
         }
-        for (dst, src) in output.iter_mut().skip(8).zip(y.iter()) {
-            *dst = (*src).min(u8::MAX as u16) as u8;
-        }
-        self.load_u8(&output)
     }
 
     #[inline(always)]
