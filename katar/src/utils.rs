@@ -20,3 +20,11 @@ macro_rules! define_as_simd {
 
 define_as_simd!(f32);
 define_as_simd!(f64);
+define_as_simd!(u8);
+define_as_simd!(i8);
+define_as_simd!(u16);
+define_as_simd!(i16);
+define_as_simd!(u32);
+define_as_simd!(i32);
+define_as_simd!(u64);
+define_as_simd!(i64);
