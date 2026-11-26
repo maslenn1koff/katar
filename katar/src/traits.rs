@@ -106,7 +106,6 @@ macro_rules! define_simd_shift_ops {
     ($ty:ident, $($name:ident),*) => {
         $(
             paste::paste! {
-                /// Element-wise comparison producing a lane mask.
                 fn [<$name _ $ty>](self, a: Self::$ty, n: u32) -> Self::$ty;
             }
         )*
@@ -211,28 +210,14 @@ pub trait IntegerSimd: Copy + Sync + Send + 'static {
     define_simd_unary_ops!(u64, bitnot, count_ones, leading_zeros, trailing_zeros);
     define_simd_unary_ops!(i64, bitnot, count_ones, leading_zeros, trailing_zeros);
 
-    define_simd_binary_ops!(u8, add, sub, mul, min, max, bitand, bitor, bitxor, bitandnot);
-    define_simd_binary_ops!(i8, add, sub, mul, min, max, bitand, bitor, bitxor, bitandnot);
-    define_simd_binary_ops!(u16, add, sub, mul, min, max, bitand, bitor, bitxor, bitandnot);
-    define_simd_binary_ops!(i16, add, sub, mul, min, max, bitand, bitor, bitxor, bitandnot);
-    define_simd_binary_ops!(u32, add, sub, mul, min, max, bitand, bitor, bitxor, bitandnot);
-    define_simd_binary_ops!(i32, add, sub, mul, min, max, bitand, bitor, bitxor, bitandnot);
-    define_simd_binary_ops!(u64, add, sub, mul, min, max, bitand, bitor, bitxor, bitandnot);
-    define_simd_binary_ops!(i64, add, sub, mul, min, max, bitand, bitor, bitxor, bitandnot);
-
-    define_simd_binary_ops!(u8, sat_add, sat_sub);
-    define_simd_binary_ops!(i8, sat_add, sat_sub);
-    define_simd_binary_ops!(u16, sat_add, sat_sub);
-    define_simd_binary_ops!(i16, sat_add, sat_sub);
-    define_simd_binary_ops!(u32, sat_add, sat_sub);
-    define_simd_binary_ops!(i32, sat_add, sat_sub);
-    define_simd_binary_ops!(u64, sat_add, sat_sub);
-    define_simd_binary_ops!(i64, sat_add, sat_sub);
-
-    define_simd_binary_ops!(u8, avg_round);
-    define_simd_binary_ops!(i8, avg_round);
-    define_simd_binary_ops!(u16, avg_round);
-    define_simd_binary_ops!(i16, avg_round);
+    define_simd_binary_ops!(u8, add, sub, mul, min, max, bitand, bitor, bitxor, bitandnot, saturating_add, saturating_sub, avg_round);
+    define_simd_binary_ops!(i8, add, sub, mul, min, max, bitand, bitor, bitxor, bitandnot, saturating_add, saturating_sub, avg_round);
+    define_simd_binary_ops!(u16, add, sub, mul, min, max, bitand, bitor, bitxor, bitandnot, saturating_add, saturating_sub, avg_round);
+    define_simd_binary_ops!(i16, add, sub, mul, min, max, bitand, bitor, bitxor, bitandnot, saturating_add, saturating_sub, avg_round);
+    define_simd_binary_ops!(u32, add, sub, mul, min, max, bitand, bitor, bitxor, bitandnot, saturating_add, saturating_sub, avg_round);
+    define_simd_binary_ops!(i32, add, sub, mul, min, max, bitand, bitor, bitxor, bitandnot, saturating_add, saturating_sub, avg_round);
+    define_simd_binary_ops!(u64, add, sub, mul, min, max, bitand, bitor, bitxor, bitandnot, saturating_add, saturating_sub, avg_round);
+    define_simd_binary_ops!(i64, add, sub, mul, min, max, bitand, bitor, bitxor, bitandnot, saturating_add, saturating_sub, avg_round);
 
     define_simd_compare_ops!(u8, m8, eq, ne, lt, le, gt, ge);
     define_simd_compare_ops!(i8, m8, eq, ne, lt, le, gt, ge);
@@ -276,10 +261,10 @@ pub trait IntegerSimd: Copy + Sync + Send + 'static {
     fn widen_low_i32_to_i64(self, x: Self::i32) -> Self::i64;
     fn widen_high_i32_to_i64(self, x: Self::i32) -> Self::i64;
 
-    fn narrow_sat_u16_to_u8(self, lo: Self::u16, hi: Self::u16) -> Self::u8;
-    fn narrow_sat_i16_to_i8(self, lo: Self::i16, hi: Self::i16) -> Self::i8;
-    fn narrow_sat_u32_to_u16(self, lo: Self::u32, hi: Self::u32) -> Self::u16;
-    fn narrow_sat_i32_to_i16(self, lo: Self::i32, hi: Self::i32) -> Self::i16;
-    fn narrow_sat_u64_to_u32(self, lo: Self::u64, hi: Self::u64) -> Self::u32;
-    fn narrow_sat_i64_to_i32(self, lo: Self::i64, hi: Self::i64) -> Self::i32;
+    fn narrow_saturating_u16_to_u8(self, lo: Self::u16, hi: Self::u16) -> Self::u8;
+    fn narrow_saturating_i16_to_i8(self, lo: Self::i16, hi: Self::i16) -> Self::i8;
+    fn narrow_saturating_u32_to_u16(self, lo: Self::u32, hi: Self::u32) -> Self::u16;
+    fn narrow_saturating_i32_to_i16(self, lo: Self::i32, hi: Self::i32) -> Self::i16;
+    fn narrow_saturating_u64_to_u32(self, lo: Self::u64, hi: Self::u64) -> Self::u32;
+    fn narrow_saturating_i64_to_i32(self, lo: Self::i64, hi: Self::i64) -> Self::i32;
 }
