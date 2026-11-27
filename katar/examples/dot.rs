@@ -1,13 +1,12 @@
 fn dot_f32(x: &[f32], y: &[f32]) -> f32 {
+    assert_eq!(x.len(), y.len());
+
     struct Impl<'a>(&'a [f32], &'a [f32]);
 
     impl<'a> katar::SimdFn for Impl<'a> {
         type Result = f32;
 
-        #[inline(always)]
         fn call<S: katar::traits::Simd>(self, simd: S) -> Self::Result {
-            assert_eq!(self.0.len(), self.1.len());
-
             let (x_head, x_tail) = katar::utils::as_simd_f32(&simd, self.0);
             let (y_head, y_tail) = katar::utils::as_simd_f32(&simd, self.1);
 
