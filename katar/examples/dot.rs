@@ -8,8 +8,8 @@ fn dot_f32(x: &[f32], y: &[f32]) -> f32 {
 
         #[inline(always)]
         fn call<S: katar::traits::Simd>(self, simd: S) -> Self::Result {
-            let (x_head, x_tail) = katar::utils::as_simd_arrays_f32::<8, _>(&simd, self.0);
-            let (y_head, y_tail) = katar::utils::as_simd_arrays_f32::<8, _>(&simd, self.1);
+            let (x_head, x_tail) = katar::utils::as_simd_f32::<8, _>(&simd, self.0);
+            let (y_head, y_tail) = katar::utils::as_simd_f32::<8, _>(&simd, self.1);
 
             let mut acc = [simd.splat_f32(0.0); 8];
 
