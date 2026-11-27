@@ -107,6 +107,7 @@ impl WithSimd for PulpDot<'_> {
     }
 }
 
+#[allow(clippy::needless_range_loop)]
 #[inline(always)]
 fn dot_fearless<S: FearlessSimd>(simd: S, x: &[f32], y: &[f32]) -> f32 {
     let zero = S::f32s::splat(simd, 0.0);
@@ -148,7 +149,6 @@ fn fearless_dot<S: FearlessSimd>(simd: S, x: &[f32], y: &[f32]) -> f32 {
 }
 
 #[inline(always)]
-
 fn lowercase_scalar(data: &mut [u8]) {
     for byte in data {
         if byte.is_ascii_uppercase() {
