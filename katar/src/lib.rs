@@ -133,6 +133,7 @@ impl Arch {
     /// Runs `op` on the selected backend.
     ///
     /// Put loops inside the [`SimdFn`] implementation so dispatch happens once per operation.
+    #[inline(always)]
     pub fn dispatch<Op: SimdFn>(&self, op: Op) -> Op::Result {
         match self.backend {
             #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
