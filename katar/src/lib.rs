@@ -1,3 +1,57 @@
+//! Portable SIMD with runtime backend selection.
+//!
+//! Write vector code once as a [`SimdFn`] generic over [`traits::Simd`], then run it with
+//! [`Arch::dispatch`]. The best available backend — AVX-512, AVX2+FMA, SSE2, NEON or a scalar
+//! fallback — is selected at runtime from the CPU features. The crate is `no_std` and
+//! allocation-free.
+//!
+//! # Example
+//!
+//! ```
+//! use katar::traits::Simd;
+//! use katar::{Arch, SimdFn};
+//!
+//! fn sum(data: &[f32]) -> f32 {
+//!     struct Sum<'a>(&'a [f32]);
+//!
+//!     impl SimdFn for Sum<'_> {
+//!         type Result = f32;
+//!
+//!         #[inline]
+//!         fn call<S: Simd>(self, simd: S) -> f32 {
+//!             let (vectors, tail) = katar::utils::as_simd_f32(&simd, self.0);
+//!
+//!             let mut acc = simd.splat_f32(0.0);
+//!             for v in vectors {
+//!                 acc = simd.add_f32(acc, v);
+//!             }
+//!
+//!             let mut total = simd.reduce_sum_f32(acc);
+//!             for x in tail {
+//!                 total += x;
+//!             }
+//!             total
+//!         }
+//!     }
+//!
+//!     Arch::new().dispatch(Sum(data))
+//! }
+//!
+//! assert_eq!(sum(&[1.0, 2.0, 3.0]), 6.0);
+//! ```
+//!
+//! # Writing portable code
+//!
+//! Lane counts are backend-dependent: use `S::*_lanes` and the helpers in [`utils`] instead of
+//! assuming a vector width. Put loops inside [`SimdFn::call`] so dispatch is paid once per
+//! operation, and reuse one [`Arch`] instead of constructing it in a loop.
+//!
+//! For hot paths, mark `call` and its small helper functions `#[inline]` (or `#[inline(always)]`)
+//! so the backend-specific loop body is inlined into the dispatched target-feature function
+//! rather than remaining an opaque call.
+//!
+//! Dispatch is safe: hardware backends are entered only after [`Arch::new`] has detected their
+//! features. Only the `load_unchecked_*` and `store_unchecked_*` operations are `unsafe`.
 #![no_std]
 #![allow(non_upper_case_globals, non_camel_case_types, clippy::new_without_default)]
 use crate::{backend::fallback::ScalarFallback, traits::Simd};
@@ -6,8 +60,14 @@ mod backend;
 pub mod traits;
 pub mod utils;
 
+/// A portable SIMD operation.
+///
+/// Implement `call` using only [`traits::Simd`] operations and pass the value to
+/// [`Arch::dispatch`]. `call` is instantiated once per available backend.
 pub trait SimdFn {
+    /// Operation result.
     type Result;
+    /// Runs the operation with the given backend.
     fn call<S: Simd>(self, simd: S) -> Self::Result;
 }
 
@@ -27,12 +87,16 @@ enum Backend {
     Neon,
 }
 
+/// Runtime CPU feature detector and dispatcher.
+///
+/// Create once with [`Arch::new`] and reuse it for repeated [`Arch::dispatch`] calls.
 #[derive(Clone, Copy)]
 pub struct Arch {
     backend: Backend,
 }
 
 impl Arch {
+    /// Detects the best available backend, falling back to scalar.
     pub fn new() -> Self {
         #[cfg(target_arch = "aarch64")]
         {
@@ -66,6 +130,9 @@ impl Arch {
         Arch { backend: Backend::ScalarFallback }
     }
 
+    /// Runs `op` on the selected backend.
+    ///
+    /// Put loops inside the [`SimdFn`] implementation so dispatch happens once per operation.
     pub fn dispatch<Op: SimdFn>(&self, op: Op) -> Op::Result {
         match self.backend {
             #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]

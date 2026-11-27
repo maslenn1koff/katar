@@ -106,6 +106,7 @@ macro_rules! define_simd_shift_ops {
     ($ty:ident, $($name:ident),*) => {
         $(
             paste::paste! {
+                /// Shifts every lane by `n` bits (left for `shl`, right for `shr`).
                 fn [<$name _ $ty>](self, a: Self::$ty, n: u32) -> Self::$ty;
             }
         )*
@@ -237,34 +238,60 @@ pub trait IntegerSimd: Copy + Sync + Send + 'static {
     define_simd_shift_ops!(u64, shl, shr);
     define_simd_shift_ops!(i64, shl, shr);
 
+    /// Per lane: `mask ? a : b`.
     fn select_u8(self, mask: Self::m8, a: Self::u8, b: Self::u8) -> Self::u8;
+    /// Per lane: `mask ? a : b`.
     fn select_i8(self, mask: Self::m8, a: Self::i8, b: Self::i8) -> Self::i8;
+    /// Per lane: `mask ? a : b`.
     fn select_u16(self, mask: Self::m16, a: Self::u16, b: Self::u16) -> Self::u16;
+    /// Per lane: `mask ? a : b`.
     fn select_i16(self, mask: Self::m16, a: Self::i16, b: Self::i16) -> Self::i16;
+    /// Per lane: `mask ? a : b`.
     fn select_u32(self, mask: Self::m32, a: Self::u32, b: Self::u32) -> Self::u32;
+    /// Per lane: `mask ? a : b`.
     fn select_i32(self, mask: Self::m32, a: Self::i32, b: Self::i32) -> Self::i32;
+    /// Per lane: `mask ? a : b`.
     fn select_u64(self, mask: Self::m64, a: Self::u64, b: Self::u64) -> Self::u64;
+    /// Per lane: `mask ? a : b`.
     fn select_i64(self, mask: Self::m64, a: Self::i64, b: Self::i64) -> Self::i64;
 
+    /// Widens the low half of the lanes from `u8` to `u16`.
     fn widen_low_u8_to_u16(self, x: Self::u8) -> Self::u16;
+    /// Widens the high half of the lanes from `u8` to `u16`.
     fn widen_high_u8_to_u16(self, x: Self::u8) -> Self::u16;
+    /// Widens the low half of the lanes from `i8` to `i16`.
     fn widen_low_i8_to_i16(self, x: Self::i8) -> Self::i16;
+    /// Widens the high half of the lanes from `i8` to `i16`.
     fn widen_high_i8_to_i16(self, x: Self::i8) -> Self::i16;
 
+    /// Widens the low half of the lanes from `u16` to `u32`.
     fn widen_low_u16_to_u32(self, x: Self::u16) -> Self::u32;
+    /// Widens the high half of the lanes from `u16` to `u32`.
     fn widen_high_u16_to_u32(self, x: Self::u16) -> Self::u32;
+    /// Widens the low half of the lanes from `i16` to `i32`.
     fn widen_low_i16_to_i32(self, x: Self::i16) -> Self::i32;
+    /// Widens the high half of the lanes from `i16` to `i32`.
     fn widen_high_i16_to_i32(self, x: Self::i16) -> Self::i32;
 
+    /// Widens the low half of the lanes from `u32` to `u64`.
     fn widen_low_u32_to_u64(self, x: Self::u32) -> Self::u64;
+    /// Widens the high half of the lanes from `u32` to `u64`.
     fn widen_high_u32_to_u64(self, x: Self::u32) -> Self::u64;
+    /// Widens the low half of the lanes from `i32` to `i64`.
     fn widen_low_i32_to_i64(self, x: Self::i32) -> Self::i64;
+    /// Widens the high half of the lanes from `i32` to `i64`.
     fn widen_high_i32_to_i64(self, x: Self::i32) -> Self::i64;
 
+    /// Narrows two `u16` vectors to one `u8` vector with saturation; `lo` lanes come first.
     fn narrow_saturating_u16_to_u8(self, lo: Self::u16, hi: Self::u16) -> Self::u8;
+    /// Narrows two `i16` vectors to one `i8` vector with saturation; `lo` lanes come first.
     fn narrow_saturating_i16_to_i8(self, lo: Self::i16, hi: Self::i16) -> Self::i8;
+    /// Narrows two `u32` vectors to one `u16` vector with saturation; `lo` lanes come first.
     fn narrow_saturating_u32_to_u16(self, lo: Self::u32, hi: Self::u32) -> Self::u16;
+    /// Narrows two `i32` vectors to one `i16` vector with saturation; `lo` lanes come first.
     fn narrow_saturating_i32_to_i16(self, lo: Self::i32, hi: Self::i32) -> Self::i16;
+    /// Narrows two `u64` vectors to one `u32` vector with saturation; `lo` lanes come first.
     fn narrow_saturating_u64_to_u32(self, lo: Self::u64, hi: Self::u64) -> Self::u32;
+    /// Narrows two `i64` vectors to one `i32` vector with saturation; `lo` lanes come first.
     fn narrow_saturating_i64_to_i32(self, lo: Self::i64, hi: Self::i64) -> Self::i32;
 }
