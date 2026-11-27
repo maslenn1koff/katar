@@ -17,7 +17,7 @@
 //!     impl SimdFn for Sum<'_> {
 //!         type Result = f32;
 //!
-//!         #[inline]
+//!         #[inline(always)]
 //!         fn call<S: Simd>(self, simd: S) -> f32 {
 //!             let (vectors, tail) = katar::utils::as_simd_f32::<4, _>(&simd, self.0);
 //!
@@ -48,9 +48,10 @@
 //! assuming a vector width. Put loops inside [`SimdFn::call`] so dispatch is paid once per
 //! operation, and reuse one [`Arch`] instead of constructing it in a loop.
 //!
-//! For hot paths, mark `call` and its small helper functions `#[inline]` (or `#[inline(always)]`)
-//! so the backend-specific loop body is inlined into the dispatched target-feature function
-//! rather than remaining an opaque call.
+//! For hot paths, mark `call` and its small helper functions `#[inline(always)]` so the
+//! backend-specific loop body is inlined into the dispatched target-feature function rather than
+//! remaining an opaque call. Without this the backend intrinsics cannot be inlined either, and the
+//! operation can become tens of times slower.
 //!
 //! Dispatch is safe: hardware backends are entered only after [`Arch::new`] has detected their
 //! features. Only the `load_unchecked_*` and `store_unchecked_*` operations are `unsafe`.
@@ -70,6 +71,11 @@ pub trait SimdFn {
     /// Operation result.
     type Result;
     /// Runs the operation with the given backend.
+    ///
+    /// Mark the implementation `#[inline(always)]`. Dispatch calls this method from a function
+    /// compiled with the backend's target features; if it is not inlined, the backend intrinsics
+    /// cannot be inlined into that function either and every SIMD operation turns into an
+    /// out-of-line call, which can be tens of times slower.
     fn call<S: Simd>(self, simd: S) -> Self::Result;
 }
 
