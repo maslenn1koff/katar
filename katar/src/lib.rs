@@ -19,11 +19,13 @@
 //!
 //!         #[inline]
 //!         fn call<S: Simd>(self, simd: S) -> f32 {
-//!             let (vectors, tail) = katar::utils::as_simd_f32(&simd, self.0);
+//!             let (vectors, tail) = katar::utils::as_simd_f32::<4, _>(&simd, self.0);
 //!
 //!             let mut acc = simd.splat_f32(0.0);
-//!             for v in vectors {
-//!                 acc = simd.add_f32(acc, v);
+//!             for block in vectors {
+//!                 for v in block {
+//!                     acc = simd.add_f32(acc, v);
+//!                 }
 //!             }
 //!
 //!             let mut total = simd.reduce_sum_f32(acc);
