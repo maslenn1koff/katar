@@ -561,7 +561,7 @@ fn sse2_load_f64_panics_on_short_slice() {
 
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 fn avx512f_available() -> bool {
-    core_detect::is_x86_feature_detected!("avx512f")
+    core_detect::is_x86_feature_detected!("avx512f") && core_detect::is_x86_feature_detected!("avx512bw") && core_detect::is_x86_feature_detected!("avx512dq")
 }
 
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
@@ -1504,7 +1504,7 @@ fn avx2_integer_i64() {
 
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 fn avx512_int_software_available() -> bool {
-    core_detect::is_x86_feature_detected!("avx512f") && core_detect::is_x86_feature_detected!("avx512bw") && core_detect::is_x86_feature_detected!("avx512dq")
+    avx512f_available()
 }
 
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
