@@ -1128,6 +1128,24 @@ fn exercise_int_u32<S: IntegerSimd>(simd: S) {
             assert_eq!(out[i + S::u64_lanes], hi[i].min(u32::MAX as u64) as u32, "narrow_u64_to_u32 hi lane {i}");
         }
     }
+
+    if S::u16_lanes == S::u32_lanes * 2 {
+        let mut lo = [0u32; MAX_U32_LANES];
+        let mut hi = [0u32; MAX_U32_LANES];
+        for i in 0..S::u32_lanes {
+            lo[i] = (i as u32).wrapping_mul(0x1234_5678);
+            hi[i] = u32::MAX.wrapping_sub(i as u32);
+        }
+        lo[0] = 0;
+        lo[1] = u16::MAX as u32;
+        lo[2] = u16::MAX as u32 + 1;
+
+        let out = store_u16(simd, simd.narrow_saturating_u32_to_u16(simd.load_u32(&lo), simd.load_u32(&hi)));
+        for i in 0..S::u32_lanes {
+            assert_eq!(out[i], lo[i].min(u16::MAX as u32) as u16, "narrow_u32_to_u16 lo lane {i}");
+            assert_eq!(out[i + S::u32_lanes], hi[i].min(u16::MAX as u32) as u16, "narrow_u32_to_u16 hi lane {i}");
+        }
+    }
 }
 
 fn exercise_int_i32<S: IntegerSimd>(simd: S) {

@@ -2257,9 +2257,6 @@ impl<E: Avx512IntegerExt> IntegerSimd for Avx512F<E> {
     #[inline(always)]
     fn narrow_saturating_u16_to_u8(self, lo: Self::u16, hi: Self::u16) -> Self::u8 {
         unsafe {
-            let max = _mm512_set1_epi16(u8::MAX as i16);
-            let lo = _mm512_min_epu16(lo, max);
-            let hi = _mm512_min_epu16(hi, max);
             let lo = _mm512_cvtusepi16_epi8(lo);
             let hi = _mm512_cvtusepi16_epi8(hi);
             _mm512_inserti64x4::<1>(_mm512_castsi256_si512(lo), hi)
@@ -2278,9 +2275,6 @@ impl<E: Avx512IntegerExt> IntegerSimd for Avx512F<E> {
     #[inline(always)]
     fn narrow_saturating_u32_to_u16(self, lo: Self::u32, hi: Self::u32) -> Self::u16 {
         unsafe {
-            let max = _mm512_set1_epi32(u16::MAX as i32);
-            let lo = _mm512_min_epu32(lo, max);
-            let hi = _mm512_min_epu32(hi, max);
             let lo = _mm512_cvtusepi32_epi16(lo);
             let hi = _mm512_cvtusepi32_epi16(hi);
             _mm512_inserti64x4::<1>(_mm512_castsi256_si512(lo), hi)
@@ -2299,9 +2293,6 @@ impl<E: Avx512IntegerExt> IntegerSimd for Avx512F<E> {
     #[inline(always)]
     fn narrow_saturating_u64_to_u32(self, lo: Self::u64, hi: Self::u64) -> Self::u32 {
         unsafe {
-            let max = _mm512_set1_epi64(u32::MAX as i64);
-            let lo = _mm512_min_epu64(lo, max);
-            let hi = _mm512_min_epu64(hi, max);
             let lo = _mm512_cvtusepi64_epi32(lo);
             let hi = _mm512_cvtusepi64_epi32(hi);
             _mm512_inserti64x4::<1>(_mm512_castsi256_si512(lo), hi)
