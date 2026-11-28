@@ -87,7 +87,7 @@ pub trait SimdFn {
     fn call<S: Simd>(self, simd: S) -> Self::Result;
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy)]
 enum Backend {
     #[allow(dead_code)]
     ScalarFallback,
