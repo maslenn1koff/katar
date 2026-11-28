@@ -121,15 +121,76 @@ macro_rules! define_simd_shift_ops {
     };
 }
 
+/// A per-lane boolean mask.
+///
+/// Masks are returned by the element-wise comparison operations (`eq_*`, `ne_*`,
+/// `lt_*`, `le_*`, `gt_*`, `ge_*`) and consumed by the `select_*` operations. The
+/// concrete representation is backend-specific: a vector of all-ones/all-zeros lanes
+/// on SSE2, AVX2 and NEON, a bitmask register on AVX-512, a plain `bool` on the scalar
+/// fallback. A mask type is therefore tied to its backend and to one element width and
+/// cannot be mixed with a mask of another width (even on the same backend).
+///
+/// [`to_bits`](MaskSimd::to_bits) and [`from_bits`](MaskSimd::from_bits) provide a
+/// portable representation: bit `i` corresponds to lane `i`, and the number of
+/// meaningful bits is the lane count of the corresponding element type
+/// (`f32_lanes`/`f64_lanes` for `mf32`/`mf64`, `u8_lanes` for `m8`, and so on). Bits
+/// at or above the lane count are ignored by `from_bits` and are never set by
+/// `to_bits`, so `from_bits(bits).to_bits() == bits & ((1 << lanes) - 1)`.
+///
+/// The logical operations are element-wise: [`and`](MaskSimd::and) and
+/// [`or`](MaskSimd::or) combine lanes pairwise, [`not`](MaskSimd::not) negates every
+/// lane. [`splat`](MaskSimd::splat) produces a uniform mask, [`any`](MaskSimd::any)
+/// and [`all`](MaskSimd::all) test whether at least one or every lane is set.
+///
+/// # Example
+///
+/// ```
+/// use katar::traits::{MaskSimd, Simd};
+/// use katar::{Arch, SimdFn};
+///
+/// struct AllLanes;
+///
+/// impl SimdFn for AllLanes {
+///     type Result = bool;
+///
+///     #[inline(always)]
+///     fn call<S: Simd>(self, _simd: S) -> bool {
+///         let all = if S::f32_lanes == 64 { u64::MAX } else { (1u64 << S::f32_lanes) - 1 };
+///         let mask = <S::mf32 as MaskSimd>::from_bits(all);
+///         mask.to_bits() == all && mask.all() && mask.any() && !mask.not().any()
+///     }
+/// }
+///
+/// assert!(Arch::new().dispatch(AllLanes));
+/// ```
 pub trait MaskSimd: Copy + Send + Sync + 'static {
+    /// Returns a mask with every lane set to `v`.
     fn splat(v: bool) -> Self;
+
+    /// Builds a mask from its bit representation.
+    ///
+    /// Bit `i` of `v` becomes lane `i`. Bits at or above the lane count are ignored.
     fn from_bits(v: u64) -> Self;
+
+    /// Returns the bit representation of the mask.
+    ///
+    /// Bit `i` is set exactly when lane `i` is set. Bits at or above the lane count
+    /// are always zero.
     fn to_bits(self) -> u64;
 
+    /// Per-lane logical AND.
     fn and(self, other: Self) -> Self;
+
+    /// Per-lane logical OR.
     fn or(self, other: Self) -> Self;
+
+    /// Per-lane logical NOT.
     fn not(self) -> Self;
+
+    /// Returns `true` if at least one lane is set.
     fn any(self) -> bool;
+
+    /// Returns `true` if every lane is set.
     fn all(self) -> bool;
 }
 
