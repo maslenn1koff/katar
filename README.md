@@ -1,7 +1,7 @@
 # katar
 
 [![CI](https://img.shields.io/github/actions/workflow/status/maslenn1koff/katar/rust.yml?style=flat&label=CI&labelColor=white&color=white)](https://github.com/maslenn1koff/katar/actions/workflows/rust.yml)
-[![License](https://img.shields.io/badge/license-MIT-white?style=flat&labelColor=white&color=white)](LICENSE.md)
+[![License](https://img.shields.io/badge/license-MIT-white?style=flat&labelColor=white&color=white)](https://github.com/maslenn1koff/katar/blob/main/LICENSE.md)
 ![MSRV](https://img.shields.io/badge/MSRV-1.89-white?style=flat&labelColor=white&color=white)
 
 **Portable SIMD abstraction for Rust.**
@@ -65,3 +65,11 @@ fn main() {
 `Arch::new().dispatch()` selects a backend using runtime CPU feature detection.
 
 On x86 and x86_64, detection uses CPUID and XCR0 to verify both processor capabilities and operating system support. On aarch64, NEON is used as the baseline backend.
+
+## Benchmarks
+
+![katar vs. pulp vs. fearless_simd](https://raw.githubusercontent.com/maslenn1koff/katar/main/assets/bench.svg)
+
+Median throughput for `dot_f32` and `ascii_lowercase` on a 12th Gen Intel Core
+i5-12600H; higher is better. See the
+[raw results](https://github.com/maslenn1koff/katar/blob/main/assets/raw_bench.txt).

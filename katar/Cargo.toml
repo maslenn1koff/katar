@@ -3,6 +3,9 @@ name = "katar"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.89"
+description = "Portable SIMD abstraction for Rust"
+license = "MIT"
+repository = "https://github.com/maslenn1koff/katar"
 readme = "../README.md"
 
 [dependencies]
