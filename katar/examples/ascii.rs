@@ -4,6 +4,7 @@ fn ascii_lowercase(data: &mut [u8]) {
     impl<'a> katar::SimdFn for Impl<'a> {
         type Result = ();
 
+        #[inline(always)]
         fn call<S: katar::traits::Simd>(self, simd: S) -> Self::Result {
             let case_bit = simd.splat_u8(0x20);
 
@@ -25,7 +26,7 @@ fn ascii_lowercase(data: &mut [u8]) {
         }
     }
 
-    let arch = katar::Arch::new();
+    let arch = katar::Arch::new(); // In prod, move the creation of Arch into the main function.
     arch.dispatch(Impl(data));
 }
 

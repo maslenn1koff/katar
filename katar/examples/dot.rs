@@ -41,7 +41,7 @@ fn dot_f32(x: &[f32], y: &[f32]) -> f32 {
         }
     }
 
-    let arch = katar::Arch::new();
+    let arch = katar::Arch::new(); // In prod, move the creation of Arch into the main function.
     arch.dispatch(Impl(x, y))
 }
 
