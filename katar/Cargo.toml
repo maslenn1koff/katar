@@ -4,13 +4,20 @@ version = "0.1.0"
 edition = "2024"
 rust-version = "1.89"
 description = "Portable SIMD abstraction for Rust"
-license = "MIT"
+documentation = "https://docs.rs/katar"
 repository = "https://github.com/maslenn1koff/katar"
+license = "MIT"
 readme = "../README.md"
+keywords = ["simd", "avx2", "avx512", "neon", "portable-simd"]
+categories = ["hardware-support", "no-std"]
+
+[package.metadata.docs.rs]
+all-features = true
 
 [dependencies]
 paste = "1"
 libm = { version = "0.2", default-features = false }
+
 [target.'cfg(any(target_arch = "x86", target_arch = "x86_64"))'.dependencies]
 core_detect = "1"
 
