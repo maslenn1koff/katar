@@ -64,7 +64,7 @@
 //! [`traits::IntegerSimd`] documents the rounding of `avg_round`, shift masking, and the
 //! lane-count assumptions of `widen`/`narrow`.
 #![no_std]
-#![allow(non_upper_case_globals, non_camel_case_types, clippy::new_without_default)]
+#![allow(non_upper_case_globals, non_camel_case_types)]
 use crate::{backend::fallback::ScalarFallback, traits::Simd};
 
 mod backend;
@@ -111,6 +111,12 @@ pub struct Arch {
     backend: Backend,
 }
 
+impl Default for Arch {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Arch {
     /// Detects the best available backend, falling back to scalar.
     pub fn new() -> Self {
@@ -143,6 +149,11 @@ impl Arch {
         }
 
         #[cfg(not(any(target_arch = "x86", target_arch = "x86_64", target_arch = "aarch64")))]
+        Arch { backend: Backend::ScalarFallback }
+    }
+
+    /// Create with scalar fallback.
+    pub fn with_fallback() -> Self {
         Arch { backend: Backend::ScalarFallback }
     }
 
