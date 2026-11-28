@@ -55,6 +55,14 @@
 //!
 //! Dispatch is safe: hardware backends are entered only after [`Arch::new`] has detected their
 //! features. Only the `load_unchecked_*` and `store_unchecked_*` operations are `unsafe`.
+//!
+//! # Portability notes
+//!
+//! Operations map to native instructions, so a few edge cases are backend-dependent:
+//! [`traits::FloatSimd`] documents the NaN/signed-zero behavior of `min`/`max`, the
+//! fused/non-fused distinction of `mul_add`, and the reduction order;
+//! [`traits::IntegerSimd`] documents the rounding of `avg_round`, shift masking, and the
+//! lane-count assumptions of `widen`/`narrow`.
 #![no_std]
 #![allow(non_upper_case_globals, non_camel_case_types, clippy::new_without_default)]
 use crate::{backend::fallback::ScalarFallback, traits::Simd};

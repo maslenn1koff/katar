@@ -22,7 +22,7 @@ pub fn vectorize<Op: SimdFn>(op: Op) -> Op::Result {
     enable = "avx512vpopcntdq"
 )]
 pub fn vectorize_ex<Op: SimdFn>(op: Op) -> Op::Result {
-    op.call(Avx512Software::new())
+    op.call(Avx512Native::new())
 }
 
 #[derive(Copy, Clone)]
